@@ -14,7 +14,6 @@ provider "docker" {
   #  }
 }
 
-
 resource "docker_network" "private_network" {
   name = "timesbook-net"
   ipam_config {
@@ -23,14 +22,37 @@ resource "docker_network" "private_network" {
   }
 }
 
-resource "docker_image" "timesbook" {
-  name = "localhost:5000/timesbook-front"
-  # keep_locally = false
+resource "docker_image" "timesbook-back" {
+  name = "localhost:5000/timesbook-back"
+  keep_locally = false
 }
 
-resource "docker_container" "timesbook" {
-  image = docker_image.timesbook.latest
-  name  = "timesbook-app"
+resource "docker_container" "timesbook-back" {
+  image = docker_image.timesbook-back.latest
+  name  = "timesbook-back"
+  # hostname = "timesbook-front"
+  networks_advanced {
+    name         = "timesbook-net"
+    ipv4_address = "172.18.0.31"
+  }
+  host {
+    host = "timesbook-back"
+    ip   = "172.18.0.31"
+  }
+  ports {
+    internal = 8000
+    external = 8000
+  }
+}
+
+resource "docker_image" "timesbook-front" {
+  name = "localhost:5000/timesbook-front"
+  keep_locally = false
+}
+
+resource "docker_container" "timesbook-front" {
+  image = docker_image.timesbook-front.latest
+  name  = "timesbook-front"
   # hostname = "timesbook-front"
   networks_advanced {
     name         = "timesbook-net"
