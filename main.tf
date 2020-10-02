@@ -23,14 +23,14 @@ resource "docker_network" "private_network" {
 }
 
 resource "docker_image" "timesbook-back" {
-  name = "localhost:5000/timesbook-back"
+  name         = "localhost:5000/timesbook-back"
   keep_locally = false
 }
 
 resource "docker_container" "timesbook-back" {
-  image = docker_image.timesbook-back.latest
-  name  = "timesbook-back"
-  # hostname = "timesbook-front"
+  image    = docker_image.timesbook-back.latest
+  name     = "timesbook-back"
+  hostname = "timesbook-back"
   networks_advanced {
     name         = "timesbook-net"
     ipv4_address = "172.18.0.31"
@@ -39,29 +39,27 @@ resource "docker_container" "timesbook-back" {
     host = "timesbook-back"
     ip   = "172.18.0.31"
   }
-  ports {
-    internal = 8000
-    external = 8000
-  }
 }
 
 resource "docker_image" "timesbook-front" {
-  name = "localhost:5000/timesbook-front"
+  name         = "localhost:5000/timesbook-front"
   keep_locally = false
 }
 
 resource "docker_container" "timesbook-front" {
-  image = docker_image.timesbook-front.latest
-  name  = "timesbook-front"
-  # hostname = "timesbook-front"
+  image    = docker_image.timesbook-front.latest
+  name     = "timesbook-front"
+  hostname = "timesbook-front"
   networks_advanced {
     name         = "timesbook-net"
     ipv4_address = "172.18.0.30"
   }
+  # add timesbook-back host to /etc/hosts
   host {
-    host = "timesbook-front"
-    ip   = "172.18.0.30"
+    host = "timesbook-back"
+    ip   = "172.18.0.31"
   }
+  # publish port to the world
   ports {
     internal = 80
     external = 80
