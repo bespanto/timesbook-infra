@@ -8,10 +8,10 @@ terraform {
 
 provider "docker" {
 
-  # registry_auth {
-  #    address = "localhost:5000"
-  #    config_file = "${pathexpand("~/.docker/config.json")}"
-  #  }
+   registry_auth {
+      address = "registry.gitlab.com"
+      config_file = "${pathexpand("~/.docker/config.json")}"
+    }
 }
 
 resource "docker_network" "private_network" {
@@ -23,8 +23,8 @@ resource "docker_network" "private_network" {
 }
 
 resource "docker_image" "timesbook-back" {
-  name         = "localhost:5000/timesbook-back"
-  keep_locally = false
+  name         = "registry.gitlab.com/sstyle/timesbook-backend"
+  keep_locally = true
 }
 
 resource "docker_container" "timesbook-back" {
@@ -39,11 +39,16 @@ resource "docker_container" "timesbook-back" {
     host = "timesbook-back"
     ip   = "172.18.0.31"
   }
+  volumes {
+    container_path  = "/usr/src/app"
+    read_only = false
+    host_path = "/home/sstyle/timesbook-backend"
+  }
 }
 
 resource "docker_image" "timesbook-front" {
-  name         = "localhost:5000/timesbook-front"
-  keep_locally = false
+  name         = "registry.gitlab.com/sstyle/timesbook-frontend"
+  keep_locally = true
 }
 
 resource "docker_container" "timesbook-front" {
